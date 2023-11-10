@@ -1,0 +1,95 @@
+// Constants for Google Custom Search API and maximum keywords
+const GOOGLE_API_KEY = "GOOGLE API KEY";
+const CUSTOM_SEARCH_ENGINE_ID = "CUSTOM_SEARCH_ENGINE_ID";
+const MAX_KEYWORDS = '500'; // Adjust as needed
+
+function onOpen() {
+  var ui = SpreadsheetApp.getUi();
+  var menu = [{name: "Keywords", functionName: "dupName"}];
+  SpreadsheetApp.getActiveSpreadsheet().addMenu("Keywords", menu);
+  ui.createMenu('SEO Ruler')
+    .addItem('Keyword Ideas (columns)', 'seoRulerSuggestColumns')
+    .addItem('Keyword Ideas (columns, append)', 'seoRulerSuggestColumnsAppend')
+    .addItem('Keyword Ideas (rows)', 'seoRulerSuggestRows')
+    .addItem('Keyword Ideas (rows, append)', 'seoRulerSuggestRowsAppend')
+    .addToUi();  
+}
+
+function seoRulerSuggestRows() {  
+  var sheet = SpreadsheetApp.getActiveSheet();
+  var seed = sheet.getActiveCell().getValue();
+
+  var response = UrlFetchApp.fetch(`https://www.googleapis.com/customsearch/v1?q=${seed}&key=${GOOGLE_API_KEY}&cx=${CUSTOM_SEARCH_ENGINE_ID}&num=${MAX_KEYWORDS}`);
+  var json = response.getContentText();
+  var data = JSON.parse(json);  
+  var cell = sheet.getCurrentCell();
+
+  sheet.getRange(cell.getRow()+1, cell.getColumn(), data.suggestions.length, 1).setValues(data.suggestions.map((s) => [s]));
+}
+
+function seoRulerSuggestRowsAppend() {  
+  var sheet = SpreadsheetApp.getActiveSheet();
+  var seed = sheet.getActiveCell().getValue();
+
+  var response = UrlFetchApp.fetch(`https://www.googleapis.com/customsearch/v1?q=${seed}&key=${GOOGLE_API_KEY}&cx=${CUSTOM_SEARCH_ENGINE_ID}&num=${MAX_KEYWORDS}`);
+  var json = response.getContentText();
+  var data = JSON.parse(json);  
+  var cell = sheet.getCurrentCell();
+
+  sheet.getRange(sheet.getLastRow()+1, cell.getColumn(), data.suggestions.length, 1).setValues(data.suggestions.map((s) => [s]));
+}
+
+function seoRulerSuggestColumns() {  
+  var sheet = SpreadsheetApp.getActiveSheet();
+  var seed = sheet.getActiveCell().getValue();
+
+  var response = UrlFetchApp.fetch(`https://www.googleapis.com/customsearch/v1?q=${seed}&key=${GOOGLE_API_KEY}&cx=${CUSTOM_SEARCH_ENGINE_ID}&num=${MAX_KEYWORDS}`);
+  var json = response.getContentText();
+  var data = JSON.parse(json);  
+  var cell = sheet.getCurrentCell();
+
+  sheet.getRange(cell.getRow(), cell.getColumn()+1, 1, data.suggestions.length).setValues([data.suggestions]);
+}
+
+function seoRulerSuggestColumnsAppend() {  
+  var sheet = SpreadsheetApp.getActiveSheet();
+  var seed = sheet.getActiveCell().getValue();
+
+  var response = UrlFetchApp.fetch(`https://www.googleapis.com/customsearch/v1?q=${seed}&key=${GOOGLE_API_KEY}&cx=${CUSTOM_SEARCH_ENGINE_ID}&num=${MAX_KEYWORDS}`);
+  var json = response.getContentText();
+  var data = JSON.parse(json);  
+  var cell = sheet.getCurrentCell();
+
+  sheet.getRange(cell.getRow(), sheet.getLastColumn()+1, 1, data.suggestions.length).setValues([data.suggestions]);
+}
+
+function GetSheetName() {
+return SpreadsheetApp.getActiveSpreadsheet().getActiveSheet().getName();
+}
+
+function dupName() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getActiveSheet();
+  var name = Browser.inputBox('Enter your keyword or keywords here');
+  ss.insertSheet(name, {template: sheet});
+  var spreadsheet = SpreadsheetApp.getActive();
+  spreadsheet.getRange('A1').activate();
+  seoRulerSuggestRows();
+  spreadsheet.getRange('B1').activate();
+  seoRulerSuggestRows();
+  spreadsheet.getRange('C1').activate();
+  seoRulerSuggestRows();
+  spreadsheet.getRange('D1').activate();
+  seoRulerSuggestRows();
+  spreadsheet.getRange('E1').activate();
+  seoRulerSuggestRows();
+  spreadsheet.getRange('F1').activate();
+  seoRulerSuggestRows();
+  spreadsheet.getRange('G1').activate();
+  seoRulerSuggestRows();
+    for (var i = 1; i < 9; i ++){ sheet.autoResizeColumn(i);}
+}
+
+function autoResizeMultipleColumns() {
+ SpreadsheetApp.getActiveSheet().autoResizeColumns(1);
+}
